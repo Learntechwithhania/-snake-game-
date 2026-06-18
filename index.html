@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🐍 Neon Snake - The Ultimate Snake Game</title>
+    <meta name="description" content="Play the most addictive neon snake game with stunning visuals and smooth gameplay">
+    <meta property="og:title" content="Neon Snake Game">
+    <meta property="og:description" content="The most visually stunning snake game ever!">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-wrapper">
+        <!-- Animated Background -->
+        <div class="bg-animation">
+            <div class="stars"></div>
+            <div class="stars2"></div>
+            <div class="stars3"></div>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="startScreen" class="screen active">
+            <div class="logo-container">
+                <h1 class="game-logo">
+                    <span class="neon-text">NEON</span>
+                    <span class="snake-icon">🐍</span>
+                    <span class="neon-text green">SNAKE</span>
+                </h1>
+                <p class="tagline">The Ultimate Snake Experience</p>
+            </div>
+
+            <div class="menu-buttons">
+                <button class="btn btn-primary" id="playBtn">
+                    <span class="btn-icon">▶</span>
+                    <span>PLAY GAME</span>
+                </button>
+                <button class="btn btn-secondary" id="settingsBtn">
+                    <span class="btn-icon">⚙</span>
+                    <span>SETTINGS</span>
+                </button>
+                <button class="btn btn-secondary" id="howToPlayBtn">
+                    <span class="btn-icon">?</span>
+                    <span>HOW TO PLAY</span>
+                </button>
+            </div>
+
+            <div class="high-score-display">
+                <span class="label">HIGH SCORE</span>
+                <span class="value" id="menuHighScore">0</span>
+            </div>
+        </div>
+
+        <!-- Settings Screen -->
+        <div id="settingsScreen" class="screen">
+            <h2 class="screen-title">⚙ SETTINGS</h2>
+
+            <div class="settings-container">
+                <div class="setting-item">
+                    <span class="setting-label">🎨 Theme</span>
+                    <div class="theme-selector">
+                        <button class="theme-btn active" data-theme="neon">NEON</button>
+                        <button class="theme-btn" data-theme="retro">RETRO</button>
+                        <button class="theme-btn" data-theme="nature">NATURE</button>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <span class="setting-label">🐍 Snake Skin</span>
+                    <div class="skin-selector">
+                        <button class="skin-btn active" data-skin="default">DEFAULT</button>
+                        <button class="skin-btn" data-skin="fire">🔥 FIRE</button>
+                        <button class="skin-btn" data-skin="ice">❄ ICE</button>
+                        <button class="skin-btn" data-skin="rainbow">🌈 RAINBOW</button>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <span class="setting-label">🔊 Sound</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="soundToggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <span class="setting-label">🎵 Music</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="musicToggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <span class="setting-label">🧱 Wall Mode</span>
+                    <div class="wall-selector">
+                        <button class="wall-btn active" data-wall="die">DIE ON WALL</button>
+                        <button class="wall-btn" data-wall="wrap">WRAP AROUND</button>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <span class="setting-label">⚡ Difficulty</span>
+                    <div class="difficulty-selector">
+                        <button class="diff-btn" data-diff="easy">EASY</button>
+                        <button class="diff-btn active" data-diff="normal">NORMAL</button>
+                        <button class="diff-btn" data-diff="hard">HARD</button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-back" id="settingsBackBtn">← BACK</button>
+        </div>
+
+        <!-- How To Play Screen -->
+        <div id="howToPlayScreen" class="screen">
+            <h2 class="screen-title">? HOW TO PLAY</h2>
+
+            <div class="instructions">
+                <div class="instruction-item">
+                    <div class="key-icons">
+                        <span class="key">↑</span>
+                        <div class="key-row">
+                            <span class="key">←</span>
+                            <span class="key">↓</span>
+                            <span class="key">→</span>
+                        </div>
+                    </div>
+                    <p>Use Arrow Keys or WASD to move</p>
+                </div>
+
+                <div class="instruction-item">
+                    <span class="key wide">SPACE</span>
+                    <p>Pause / Resume game</p>
+                </div>
+
+                <div class="instruction-item">
+                    <div class="food-icons">
+                        <span class="food-item">🍎 +10 pts</span>
+                        <span class="food-item golden">⭐ +50 pts</span>
+                        <span class="food-item poison">💀 -20 pts</span>
+                    </div>
+                    <p>Collect food, avoid poison!</p>
+                </div>
+
+                <div class="instruction-item">
+                    <div class="powerup-icons">
+                        <span class="powerup">⚡ Speed</span>
+                        <span class="powerup">🛡 Shield</span>
+                        <span class="powerup">2️⃣ Double</span>
+                    </div>
+                    <p>Power-ups give special abilities!</p>
+                </div>
+
+                <div class="instruction-item mobile-only">
+                    <span class="swipe-icon">👆</span>
+                    <p>Swipe to move on mobile</p>
+                </div>
+            </div>
+
+            <button class="btn btn-back" id="howToPlayBackBtn">← BACK</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="screen">
+            <div class="game-header">
+                <div class="score-container">
+                    <div class="score-box">
+                        <span class="score-label">SCORE</span>
+                        <span class="score-value" id="currentScore">0</span>
+                    </div>
+                    <div class="score-box high">
+                        <span class="score-label">BEST</span>
+                        <span class="score-value" id="highScore">0</span>
+                    </div>
+                </div>
+
+                <div class="game-controls">
+                    <button class="control-btn" id="pauseBtn">⏸</button>
+                    <button class="control-btn" id="muteBtn">🔊</button>
+                </div>
+            </div>
+
+            <div class="game-container">
+                <canvas id="gameCanvas"></canvas>
+                <div class="powerup-indicator" id="powerupIndicator">
+                    <span class="powerup-icon"></span>
+                    <span class="powerup-timer"></span>
+                </div>
+            </div>
+
+            <div class="combo-display" id="comboDisplay">
+                <span class="combo-text">COMBO</span>
+                <span class="combo-value">x2</span>
+            </div>
+
+            <!-- Mobile Controls -->
+            <div class="mobile-controls" id="mobileControls">
+                <button class="mobile-btn up" data-dir="up">↑</button>
+                <div class="mobile-btn-row">
+                    <button class="mobile-btn left" data-dir="left">←</button>
+                    <button class="mobile-btn down" data-dir="down">↓</button>
+                    <button class="mobile-btn right" data-dir="right">→</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pause Screen -->
+        <div id="pauseScreen" class="screen overlay">
+            <div class="pause-content">
+                <h2 class="pause-title">⏸ PAUSED</h2>
+                <div class="pause-buttons">
+                    <button class="btn btn-primary" id="resumeBtn">
+                        <span class="btn-icon">▶</span>
+                        <span>RESUME</span>
+                    </button>
+                    <button class="btn btn-secondary" id="restartBtn">
+                        <span class="btn-icon">↻</span>
+                        <span>RESTART</span>
+                    </button>
+                    <button class="btn btn-secondary" id="quitBtn">
+                        <span class="btn-icon">✕</span>
+                        <span>QUIT</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameOverScreen" class="screen overlay">
+            <div class="gameover-content">
+                <h2 class="gameover-title">GAME OVER</h2>
+                <div class="final-score">
+                    <span class="label">YOUR SCORE</span>
+                    <span class="value" id="finalScore">0</span>
+                </div>
+                <div class="new-high-score" id="newHighScore">
+                    🎉 NEW HIGH SCORE! 🎉
+                </div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Food Eaten</span>
+                        <span class="stat-value" id="foodEaten">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Time Played</span>
+                        <span class="stat-value" id="timePlayed">0:00</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Max Combo</span>
+                        <span class="stat-value" id="maxCombo">x1</span>
+                    </div>
+                </div>
+                <div class="gameover-buttons">
+                    <button class="btn btn-primary" id="playAgainBtn">
+                        <span class="btn-icon">↻</span>
+                        <span>PLAY AGAIN</span>
+                    </button>
+                    <button class="btn btn-secondary" id="shareBtn">
+                        <span class="btn-icon">📤</span>
+                        <span>SHARE</span>
+                    </button>
+                    <button class="btn btn-secondary" id="menuBtn">
+                        <span class="btn-icon">🏠</span>
+                        <span>MENU</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
