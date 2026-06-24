@@ -170,11 +170,11 @@ class SnakeGame {
             difficulty: 'normal'
         };
 
-        // Speed settings based on difficulty
+        // Speed settings based on difficulty (slower for kids)
         this.speedSettings = {
-            easy: 150,
-            normal: 100,
-            hard: 60
+            easy: 400,      // Very slow for beginners
+            normal: 300,    // Comfortable for kids
+            hard: 220       // Moderate challenge
         };
 
         // Initialize systems
@@ -191,6 +191,12 @@ class SnakeGame {
         this.maxCombo = 0;
         this.lastEatTime = 0;
         this.comboTimeout = 2000; // 2 seconds to maintain combo
+
+        // Lives system
+        this.lives = 3;
+        this.maxLives = 3;
+        this.isInvulnerable = false;
+        this.invulnerabilityEndTime = 0;
 
         // Snake
         this.snake = [];
@@ -210,6 +216,13 @@ class SnakeGame {
             fire: { head: '#ff6600', body: '#ff3300', glow: 'rgba(255, 102, 0, 0.5)' },
             ice: { head: '#00ccff', body: '#0099cc', glow: 'rgba(0, 204, 255, 0.5)' },
             rainbow: { head: '#ff0000', body: '#ff0000', glow: 'rgba(255, 255, 255, 0.5)', rainbow: true }
+        };
+
+        // Encouraging messages for kids
+        this.encouragingMessages = {
+            foodEat: ['Great job! 🎉', 'Awesome! 🌟', 'You\'re doing amazing! 👏', 'Keep going! 💪', 'Fantastic! ✨'],
+            lostLife: ['Don\'t worry, try again! 💙', 'You can do it! 💪', 'Keep practicing! 🌟', 'Almost there! 👍'],
+            milestone: ['You\'re a star! ⭐', 'Incredible! 🎊', 'You\'re on fire! 🔥', 'Amazing skills! 🏆']
         };
 
         // Animation
@@ -495,6 +508,9 @@ class SnakeGame {
         this.lastEatTime = 0;
         this.activePowerUp = null;
         this.powerUpEndTime = 0;
+        this.lives = this.maxLives;
+        this.isInvulnerable = false;
+        this.invulnerabilityEndTime = 0;
 
         // Initialize snake in center
         const centerX = Math.floor(this.cols / 2);
@@ -513,6 +529,7 @@ class SnakeGame {
 
         // Update UI
         document.getElementById('currentScore').textContent = '0';
+        this.updateLivesDisplay();
         this.showScreen('gameScreen');
 
         // Cancel menu loop and start game loop
@@ -627,6 +644,11 @@ class SnakeGame {
             case 'right': head.x++; break;
         }
 
+        // Check invulnerability status
+        if (this.isInvulnerable && Date.now() > this.invulnerabilityEndTime) {
+            this.isInvulnerable = false;
+        }
+
         // Handle wall collision based on mode
         if (this.settings.wallMode === 'wrap') {
             if (head.x < 0) head.x = this.cols - 1;
@@ -635,16 +657,18 @@ class SnakeGame {
             if (head.y >= this.rows) head.y = 0;
         } else {
             if (head.x < 0 || head.x >= this.cols || head.y < 0 || head.y >= this.rows) {
-                this.gameOver();
+                if (!this.isInvulnerable) {
+                    this.loseLife();
+                }
                 return;
             }
         }
 
-        // Check self collision (skip if shield active)
-        if (this.activePowerUp !== 'shield') {
+        // Check self collision (skip if shield active or invulnerable)
+        if (this.activePowerUp !== 'shield' && !this.isInvulnerable) {
             for (let i = 0; i < this.snake.length; i++) {
                 if (head.x === this.snake[i].x && head.y === this.snake[i].y) {
-                    this.gameOver();
+                    this.loseLife();
                     return;
                 }
             }
@@ -679,6 +703,14 @@ class SnakeGame {
             this.audioManager.playSound('eat');
             this.createFoodParticles(head.x, head.y, '#ff4444');
             this.spawnFood();
+
+            // Show encouraging message every 5 foods
+            if (this.foodEaten % 5 === 0) {
+                this.showEncouragingMessage('milestone');
+            } else if (Math.random() < 0.3) {
+                // 30% chance to show regular encouragement
+                this.showEncouragingMessage('foodEat');
+            }
         }
 
         // Special food
@@ -775,6 +807,58 @@ class SnakeGame {
         setTimeout(() => container.classList.remove('shake'), 300);
     }
 
+    updateLivesDisplay() {
+        const hearts = '❤️'.repeat(this.lives) + '🤍'.repeat(this.maxLives - this.lives);
+        document.getElementById('livesDisplay').textContent = hearts;
+    }
+
+    showEncouragingMessage(type) {
+        const messages = this.encouragingMessages[type];
+        if (!messages || messages.length === 0) return;
+
+        const message = messages[Math.floor(Math.random() * messages.length)];
+        const messageDisplay = document.getElementById('messageDisplay');
+        const messageText = messageDisplay.querySelector('.message-text');
+
+        messageText.textContent = message;
+        messageDisplay.classList.add('show');
+
+        setTimeout(() => {
+            messageDisplay.classList.remove('show');
+        }, 1500);
+    }
+
+    loseLife() {
+        this.lives--;
+        this.updateLivesDisplay();
+        this.audioManager.playSound('poison');
+        this.shakeScreen();
+
+        if (this.lives > 0) {
+            // Still have lives, show encouraging message and make invulnerable
+            this.showEncouragingMessage('lostLife');
+            this.isInvulnerable = true;
+            this.invulnerabilityEndTime = Date.now() + 1500; // 1.5 seconds invulnerability
+
+            // Reset snake to center but keep score
+            const centerX = Math.floor(this.cols / 2);
+            const centerY = Math.floor(this.rows / 2);
+            this.snake = [
+                { x: centerX, y: centerY },
+                { x: centerX - 1, y: centerY },
+                { x: centerX - 2, y: centerY }
+            ];
+            this.direction = 'right';
+            this.nextDirection = 'right';
+
+            // Particle effect
+            this.createFoodParticles(centerX, centerY, '#ff0044');
+        } else {
+            // No more lives, game over
+            this.gameOver();
+        }
+    }
+
     draw() {
         // Clear canvas
         this.ctx.fillStyle = this.getBackgroundGradient();
@@ -832,6 +916,11 @@ class SnakeGame {
 
     drawSnake() {
         const skin = this.skinColors[this.settings.skin];
+
+        // Apply invulnerability blinking effect
+        if (this.isInvulnerable && Math.floor(Date.now() / 150) % 2 === 0) {
+            return; // Skip drawing to create blink effect
+        }
 
         this.snake.forEach((segment, index) => {
             const x = segment.x * this.gridSize;
@@ -1186,8 +1275,15 @@ class SnakeGame {
         const deltaTime = currentTime - this.lastUpdateTime;
         this.lastUpdateTime = currentTime;
 
-        // Get current speed (with power-up modifier)
+        // Get current speed with progressive difficulty
         let speed = this.speedSettings[this.settings.difficulty];
+
+        // Progressive speed increase: snake gets slightly faster as it grows
+        // But cap it so it doesn't become too fast for kids
+        const snakeLength = this.snake.length;
+        const speedReduction = Math.min(snakeLength - 3, 30) * 2; // Max 60ms speed increase
+        speed = Math.max(speed - speedReduction, speed * 0.7); // Don't go faster than 30% of base speed
+
         if (this.activePowerUp === 'speed') {
             speed *= 0.6; // 40% faster
         }

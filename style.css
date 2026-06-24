@@ -641,6 +641,11 @@ body {
     box-shadow: 0 0 10px rgba(255, 170, 0, 0.3);
 }
 
+.score-box.lives {
+    border-color: var(--danger);
+    box-shadow: 0 0 10px rgba(255, 0, 68, 0.3);
+}
+
 .score-label {
     font-size: 0.7rem;
     color: var(--text-secondary);
@@ -656,6 +661,11 @@ body {
 
 .score-box.high .score-value {
     color: var(--warning);
+}
+
+.lives-display {
+    font-size: 1.2rem;
+    line-height: 1;
 }
 
 .game-controls {
@@ -776,6 +786,46 @@ body {
     font-weight: 900;
     color: var(--warning);
     text-shadow: 0 0 30px rgba(255, 170, 0, 0.8);
+}
+
+/* Message Display */
+.message-display {
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 50;
+    padding: 20px 40px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 15px;
+    border: 2px solid var(--primary);
+}
+
+.message-display.show {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    animation: messagePopup 0.5s ease-out;
+}
+
+@keyframes messagePopup {
+    0% { transform: translate(-50%, -50%) scale(0); }
+    50% { transform: translate(-50%, -50%) scale(1.2); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+.message-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-shadow: 0 0 20px var(--primary-glow);
+    text-align: center;
 }
 
 /* ============================================
@@ -959,12 +1009,22 @@ body {
         font-size: 1rem;
     }
 
+    .score-container {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
     .score-box {
         padding: 8px 15px;
+        min-width: 80px;
     }
 
     .score-value {
         font-size: 1.2rem;
+    }
+
+    .lives-display {
+        font-size: 1rem;
     }
 
     .mobile-btn {
@@ -975,6 +1035,10 @@ body {
 
     .settings-container {
         max-height: 50vh;
+    }
+
+    .message-text {
+        font-size: 1.2rem;
     }
 }
 
